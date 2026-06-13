@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Air Quality Monitoring Dashboard</title>
+  <link rel="stylesheet" href="style.css?v=2" />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div>
+        <h1>Air Quality Monitoring Dashboard</h1>
+        <p class="subtitle">Realtime PM2.5, Temperature & Humidity</p>
+      </div>
+      <div class="controls">
+        <button id="refreshBtn">Refresh Now</button>
+        <label class="auto-refresh-toggle">
+          <input type="checkbox" id="autoRefreshToggle" checked />
+          <span>Auto Refresh (5s)</span>
+        </label>
+      </div>
+    </header>
+
+    <main class="layout">
+      <!-- Left: Gauge + current values -->
+      <section class="left-panel">
+        <div class="card gauge-card level-good" id="gaugeCard">
+          <h2>PM2.5 Air Quality</h2>
+          <div class="gauge-wrapper">
+            <div class="gauge">
+              <!-- Gauge background -->
+              <div class="gauge-arc"></div>
+              <!-- Needle -->
+              <div class="gauge-needle" id="pmNeedle"></div>
+              <div class="gauge-center"></div>
+            </div>
+            <div class="gauge-info">
+              <div class="gauge-value">
+                <span id="pmValue">--</span> <span class="unit">µg/m³</span>
+              </div>
+              <div class="gauge-status" id="pmStatus">Waiting for data…</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card metrics-card">
+          <h2>Current Sensor Readings</h2>
+          <div class="metrics-grid">
+            <div class="metric">
+              <div class="label">PM2.5</div>
+              <div class="value"><span id="pm25">--</span> <span class="unit">µg/m³</span></div>
+            </div>
+            <div class="metric">
+              <div class="label">Temperature</div>
+              <div class="value"><span id="temp">--</span> <span class="unit">°C</span></div>
+            </div>
+            <div class="metric">
+              <div class="label">Humidity</div>
+              <div class="value"><span id="humidity">--</span> <span class="unit">%</span></div>
+            </div>
+          </div>
+          <p class="last-updated">Last updated: <span id="lastUpdated">--</span></p>
+        </div>
+
+        <div class="card metrics-card">
+          <h2>Daily Carbon Calculator</h2>
+          <div class="calculator-form">
+            <div class="input-group">
+              <label>🚗 Car (km)</label>
+              <input type="number" id="calc-car" placeholder="0" min="0">
+            </div>
+            <div class="input-group">
+              <label>🚌 Transit (km)</label>
+              <input type="number" id="calc-transit" placeholder="0" min="0">
+            </div>
+            <div class="input-group">
+              <label>🚶 Walk/Bike (km)</label>
+              <input type="number" id="calc-walk" placeholder="0" min="0" title="Zero Emissions!">
+            </div>
+            <div class="input-group">
+              <label>🥩 Meat Meals</label>
+              <input type="number" id="calc-meat" placeholder="0" min="0">
+            </div>
+            <div class="input-group">
+              <label>🥗 Veg Meals</label>
+              <input type="number" id="calc-veg" placeholder="0" min="0">
+            </div>
+
+            <button id="calcBtn" class="calc-btn">Calculate Footprint</button>
+
+            <div class="result-box" id="calc-result-box" style="display: none;">
+              <div class="result-header">
+                <span class="label">Est. Daily CO2:</span>
+                <span class="value" id="calc-total">0.00</span>
+                <span class="unit">kg</span>
+              </div>
+              <div class="carbon-meter-container">
+                <div class="carbon-meter-bar" id="calc-meter-bar"></div>
+              </div>
+              <p class="result-msg" id="calc-msg">Low Impact 🌿</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Chart -->
+      <section class="right-panel">
+        <div class="card chart-card">
+          <h2>History (Last 20 Readings)</h2>
+          <canvas id="historyChart"></canvas>
+        </div>
+
+        <div class="card metrics-card" style="margin-top: 20px;">
+          <h2>Atmospheric Composition</h2>
+          <div class="metrics-grid">
+            <div class="metric">
+              <div class="label">Oxygen (O₂)</div>
+              <div class="value"><span id="val-oxygen">--</span> <span class="unit">%</span></div>
+            </div>
+            <div class="metric">
+              <div class="label">Nitrogen (N₂)</div>
+              <div class="value"><span id="val-nitrogen">--</span> <span class="unit">%</span></div>
+            </div>
+            <div class="metric">
+              <div class="label">Hydrogen (H₂)</div>
+              <div class="value"><span id="val-hydrogen">--</span> <span class="unit">ppm</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="location-controls">
+      <div class="location-search">
+        <input type="text" id="locationInput" placeholder="Enter city or address..." />
+        <button id="searchBtn">Search</button>
+      </div>
+      <div class="location-buttons">
+        <button onclick="startLocationTracking()">Re-center Location</button>
+        <button id="toggleMapBtn">Open Map</button>
+      </div>
+      <p class="location-hint" style="font-size: 0.8rem; color: #666; margin-bottom: 4px;">(Click on map to set precise
+        location)</p>
+      <p id="locationDisplay"></p>
+      <div id="map" style="height: 300px;"></div>
+    </footer>
+  </div>
+
+  <script src="script.js?v=2"></script>
+</body>
+
+</html>

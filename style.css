@@ -1,0 +1,693 @@
+/* Global layout */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  background: radial-gradient(circle at top, #eef4ff, #f3f4f6);
+  color: #111827;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+/* Header */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#refreshBtn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: none;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+}
+
+#refreshBtn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.45);
+}
+
+#refreshBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.35);
+}
+
+.auto-refresh-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #374151;
+}
+
+.auto-refresh-toggle input {
+  accent-color: #2563eb;
+}
+
+/* Layout */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
+  gap: 20px;
+}
+
+.left-panel,
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Card */
+.card {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 18px;
+  padding: 16px 18px 18px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  backdrop-filter: blur(8px);
+}
+
+.card h2 {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+  color: #111827;
+}
+
+/* Gauge */
+.gauge-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.gauge-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.gauge {
+  position: relative;
+  width: 180px;
+  height: 90px;
+  border-top-left-radius: 180px;
+  border-top-right-radius: 180px;
+  overflow: hidden;
+}
+
+/* Gauge colored bands (gradient arc) */
+.gauge-arc {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  top: 0;
+  left: 0;
+  background: conic-gradient(from 270deg,
+      #22c55e 0%,
+      #eab308 15%,
+      #f97316 30%,
+      #ef4444 40%,
+      #7e22ce 50%,
+      transparent 50%);
+  /* Create the hole in the middle */
+  -webkit-mask: radial-gradient(closest-side, transparent 76%, black 77%);
+  mask: radial-gradient(closest-side, transparent 76%, black 77%);
+}
+
+/* Needle */
+.gauge-needle {
+  position: absolute;
+  width: 2px;
+  height: 80px;
+  background: #111827;
+  bottom: 0;
+  left: 50%;
+  transform-origin: bottom center;
+  transform: rotate(-90deg);
+  transition: transform 0.4s ease-out;
+}
+
+/* Center circle */
+.gauge-center {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #111827;
+  border-radius: 50%;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Gauge info */
+.gauge-info {
+  flex: 1;
+}
+
+.gauge-value {
+  font-size: 1.6rem;
+  font-weight: 600;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.gauge-value .unit {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.gauge-status {
+  margin-top: 4px;
+  font-size: 0.9rem;
+}
+
+/* Change accent color depending on level */
+#gaugeCard.level-good .gauge-status {
+  color: #166534;
+}
+
+#gaugeCard.level-moderate .gauge-status {
+  color: #854d0e;
+}
+
+#gaugeCard.level-unhealthy .gauge-status {
+  color: #b91c1c;
+}
+
+/* Metrics card */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.metric {
+  padding: 10px;
+  border-radius: 12px;
+  background: #f9fafb;
+}
+
+.metric .label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.metric .value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.metric .unit {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.last-updated {
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* Chart */
+.chart-card {
+  height: 100%;
+}
+
+.chart-card canvas {
+  width: 100% !important;
+  height: 320px !important;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .app {
+    padding: 16px 10px 28px;
+  }
+
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .controls {
+    align-self: stretch;
+    justify-content: space-between;
+  }
+
+  .gauge-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .metrics-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Location Controls */
+.location-controls {
+  margin-top: 24px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.location-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.location-buttons button {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: none;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+/* Gauge colored bands (gradient arc) */
+.gauge-arc {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  top: 0;
+  left: 0;
+  background: conic-gradient(from 270deg,
+      #22c55e 0%,
+      #eab308 15%,
+      #f97316 30%,
+      #ef4444 40%,
+      #7e22ce 50%,
+      transparent 50%);
+  /* Create the hole in the middle */
+  -webkit-mask: radial-gradient(closest-side, transparent 76%, black 77%);
+  mask: radial-gradient(closest-side, transparent 76%, black 77%);
+}
+
+/* Needle */
+.gauge-needle {
+  position: absolute;
+  width: 2px;
+  height: 80px;
+  background: #111827;
+  bottom: 0;
+  left: 50%;
+  transform-origin: bottom center;
+  transform: rotate(-90deg);
+  transition: transform 0.4s ease-out;
+}
+
+/* Center circle */
+.gauge-center {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #111827;
+  border-radius: 50%;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Gauge info */
+.gauge-info {
+  flex: 1;
+}
+
+.gauge-value {
+  font-size: 1.6rem;
+  font-weight: 600;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.gauge-value .unit {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.gauge-status {
+  margin-top: 4px;
+  font-size: 0.9rem;
+}
+
+/* Change accent color depending on level */
+#gaugeCard.level-good .gauge-status {
+  color: #166534;
+}
+
+#gaugeCard.level-moderate .gauge-status {
+  color: #854d0e;
+}
+
+#gaugeCard.level-unhealthy .gauge-status {
+  color: #b91c1c;
+}
+
+/* Metrics card */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.metric {
+  padding: 10px;
+  border-radius: 12px;
+  background: #f9fafb;
+}
+
+.metric .label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.metric .value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.metric .unit {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* Carbon Calculator */
+.calculator-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.input-group label {
+  font-size: 0.85rem;
+  color: #374151;
+}
+
+.input-group input {
+  width: 80px;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  text-align: right;
+}
+
+.calc-btn {
+  margin-top: 8px;
+  padding: 10px;
+  width: 100%;
+  border-radius: 8px;
+  border: none;
+  background: #111827;
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.calc-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.result-box {
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.result-header {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 6px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.result-header .value {
+  font-size: 1.5rem;
+}
+
+.result-header .unit {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.carbon-meter-container {
+  width: 100%;
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 99px;
+  overflow: hidden;
+  position: relative;
+}
+
+.carbon-meter-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #22c55e, #eab308, #ef4444);
+  background-size: 200% 100%;
+  /* To allow shifting gradient if we want advanced effects */
+  background-position: 0% 0%;
+  /* Start green */
+  transition: width 0.5s ease, background-color 0.5s ease;
+  border-radius: 99px;
+}
+
+/* Dynamic colors for the bar based on JS changes or simple distinct colors */
+.meter-green {
+  background: #22c55e !important;
+}
+
+.meter-orange {
+  background: #f97316 !important;
+}
+
+.meter-red {
+  background: #ef4444 !important;
+}
+
+.result-msg {
+  text-align: center;
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.text-green {
+  color: #166534;
+}
+
+.text-orange {
+  color: #9a3412;
+}
+
+.text-red {
+  color: #991b1b;
+}
+
+.last-updated {
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* Chart */
+.chart-card {
+  height: 100%;
+}
+
+.chart-card canvas {
+  width: 100% !important;
+  height: 320px !important;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .app {
+    padding: 16px 10px 28px;
+  }
+
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .controls {
+    align-self: stretch;
+    justify-content: space-between;
+  }
+
+  .gauge-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .metrics-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Location Controls */
+.location-controls {
+  margin-top: 24px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.location-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.location-buttons button {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: none;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.location-buttons button:hover {
+  background: #1d4ed8;
+}
+
+#map {
+  width: 100%;
+  border-radius: 12px;
+  margin-top: 12px;
+}
+
+/* Location Search */
+.location-search {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.location-search input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.location-search input:focus {
+  border-color: #2563eb;
+}
+
+.location-search button {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: none;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.location-search button:hover {
+  background: #1d4ed8;
+}
